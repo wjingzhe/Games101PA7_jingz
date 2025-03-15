@@ -40,6 +40,7 @@ int main(int argc, char** argv)
     scene.Add(&light_);
 
     scene.buildBVH();
+    scene.calculateLightEmitArea();
 
     Renderer r;
 

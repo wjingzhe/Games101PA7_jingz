@@ -14,9 +14,9 @@ class Sphere : public Object{
 public:
     Vector3f center;
     float radius, radius2;
-    Material *m;
+    Material *pMaterial;
     float area;
-    Sphere(const Vector3f &c, const float &r, Material* mt = new Material()) : center(c), radius(r), radius2(r * r), m(mt), area(4 * M_PI *r *r) {}
+    Sphere(const Vector3f &c, const float &r, Material* mt = new Material()) : center(c), radius(r), radius2(r * r), pMaterial(mt), area(4 * M_PI *r *r) {}
     bool intersect(const Ray& ray) {
         // analytic solution
         Vector3f L = ray.origin - center;
@@ -61,7 +61,7 @@ public:
 
         result.coords = Vector3f(ray.origin + ray.direction * t0);
         result.normal = normalize(Vector3f(result.coords - center));
-        result.pMaterial = this->m;
+        result.pMaterial = this->pMaterial;
         result.obj = this;
         result.distance = t0;
         return result;
@@ -82,14 +82,14 @@ public:
         Vector3f dir(std::cos(phi), std::sin(phi)*std::cos(theta), std::sin(phi)*std::sin(theta));
         pos.coords = center + radius * dir;
         pos.normal = dir;
-        pos.emit = m->getEmission();
+        pos.emit = pMaterial->getEmission();
         pdf = 1.0f / area;
     }
     float getArea(){
         return area;
     }
     bool hasEmit(){
-        return m->hasEmission();
+        return pMaterial->hasEmission();
     }
 };
 

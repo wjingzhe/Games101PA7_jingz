@@ -114,7 +114,6 @@ Intersection BVHAccel::Intersect(const Ray& ray) const
 Intersection BVHAccel::getIntersection(BVHBuildNode* node, const Ray& ray) const
 {
     // TODO Traverse the BVH to find intersection
-
     Intersection isect;
     isect.happened = false;
 
@@ -196,8 +195,14 @@ void BVHAccel::getSample(BVHBuildNode* node, float p, Intersection &pos, float &
         pdf *= node->area;
         return;
     }
-    if(p < node->left->area) getSample(node->left, p, pos, pdf);
-    else getSample(node->right, p - node->left->area, pos, pdf);
+    if (p < node->left->area)
+    {
+        getSample(node->left, p, pos, pdf);
+    }
+    else
+    {
+        getSample(node->right, p - node->left->area, pos, pdf);
+    }
 }
 
 void BVHAccel::Sample(Intersection &pos, float &pdf){

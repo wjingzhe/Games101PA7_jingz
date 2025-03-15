@@ -21,8 +21,9 @@
 #endif // !RECORD_RAY_HIT_PATH
 #endif // _DEBUG
 
-struct BVHBuildNode
+class BVHBuildNode
 {
+public:
     Bounds3 bounds;
     BVHBuildNode* left;
     BVHBuildNode* right;

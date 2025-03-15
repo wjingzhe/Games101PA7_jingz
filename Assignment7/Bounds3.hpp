@@ -1,4 +1,4 @@
-﻿//
+//
 // Created by LEI XU on 5/16/19.
 //
 
@@ -46,7 +46,7 @@ class Bounds3
     }
 
     Vector3f Centroid() { return 0.5 * pMin + 0.5 * pMax; }
-    Bounds3 Intersect(const Bounds3& b)
+    Bounds3 Intersect(const Bounds3 &b)
     {
         return Bounds3(Vector3f(fmax(pMin.x, b.pMin.x), fmax(pMin.y, b.pMin.y),
                                 fmax(pMin.z, b.pMin.z)),
@@ -54,7 +54,7 @@ class Bounds3
                                 fmin(pMax.z, b.pMax.z)));
     }
 
-    Vector3f Offset(const Vector3f& p) const
+    Vector3f Offset(const Vector3f &p) const
     {
         Vector3f o = p - pMin;
         if (pMax.x > pMin.x)
@@ -66,7 +66,7 @@ class Bounds3
         return o;
     }
 
-    bool Overlaps(const Bounds3& b1, const Bounds3& b2)
+    bool Overlaps(const Bounds3 &b1, const Bounds3 &b2)
     {
         bool x = (b1.pMax.x >= b2.pMin.x) && (b1.pMin.x <= b2.pMax.x);
         bool y = (b1.pMax.y >= b2.pMin.y) && (b1.pMin.y <= b2.pMax.y);
@@ -74,12 +74,12 @@ class Bounds3
         return (x && y && z);
     }
 
-    bool Inside(const Vector3f& p, const Bounds3& b)
+    bool Inside(const Vector3f &p, const Bounds3 &b)
     {
         return (p.x >= b.pMin.x && p.x <= b.pMax.x && p.y >= b.pMin.y &&
                 p.y <= b.pMax.y && p.z >= b.pMin.z && p.z <= b.pMax.z);
     }
-    inline const Vector3f& operator[](int i) const
+    inline const Vector3f &operator[](int i) const
     {
         return (i == 0) ? pMin : pMax;
     }
@@ -118,21 +118,21 @@ inline bool Bounds3::IntersectP(const Ray& ray) const
     float t_Max_y = (pMax.y - ray.origin.y) * ray.direction_inv.y;
     float t_Max_z = (pMax.z - ray.origin.z) * ray.direction_inv.z;
 
-    if (ray.direction.x < 0.0f)//由于射线反向，所以逻辑大小相反了
+    if (ray.direction.x < 0.0f)//由于射线可能反向，此时逻辑大小相反了
     {
         float temp = t_Min_x;
         t_Min_x = t_Max_x;
         t_Max_x = temp;
     }
 
-    if (ray.direction.y < 0.0f)//由于射线反向，所以逻辑大小相反了
+    if (ray.direction.y < 0.0f)//由于射线可能反向，此时逻辑大小相反了
     {
         float temp = t_Min_y;
         t_Min_y = t_Max_y;
         t_Max_y = temp;
     }
 
-    if (ray.direction.z < 0.0f)//由于射线反向，所以逻辑大小相反了
+    if (ray.direction.z < 0.0f)///由于射线可能反向，此时逻辑大小相反了
     {
         float temp = t_Min_z;
         t_Min_z = t_Max_z;
@@ -148,7 +148,7 @@ inline bool Bounds3::IntersectP(const Ray& ray) const
     return false;
 }
 
-inline Bounds3 Union(const Bounds3& b1, const Bounds3& b2)
+inline Bounds3 Union(const Bounds3 &b1, const Bounds3 &b2)
 {
     Bounds3 ret;
     ret.pMin = Vector3f::Min(b1.pMin, b2.pMin);
@@ -156,7 +156,7 @@ inline Bounds3 Union(const Bounds3& b1, const Bounds3& b2)
     return ret;
 }
 
-inline Bounds3 Union(const Bounds3& b, const Vector3f& p)
+inline Bounds3 Union(const Bounds3 &b, const Vector3f &p)
 {
     Bounds3 ret;
     ret.pMin = Vector3f::Min(b.pMin, p);

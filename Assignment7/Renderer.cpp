@@ -25,7 +25,7 @@ void Renderer::Render(const Scene& scene)
     int m = 0;
 
     // change the spp value to change sample ammount
-    int spp = 16;
+    int spp = 1;
     std::cout << "SPP: " << spp << "\n";
     for (uint32_t j = 0; j < scene.height; ++j) {
         for (uint32_t i = 0; i < scene.width; ++i) {
@@ -42,8 +42,7 @@ void Renderer::Render(const Scene& scene)
             float y = v * scale;
 
             //因为ndc空间和view所在的模型空间重合，所以不需要坐标转换,即可在世界坐标系空间做相交检测
-            Vector3f dir_world = normalize(Vector3f(x, y, -1)); // Don't forget to normalize this direction!
-            //Ray curRay(eye_pos, dir_world);
+            Vector3f dir_world = normalize(Vector3f(-x, y, 1)); //jingz 我CTM为什么要随意加一些正负号// Don't forget to normalize this direction!
             for (int k = 0; k < spp; k++)
             {
                 framebuffer[m] += scene.castRay(Ray(eye_pos, dir_world), 0) / spp;

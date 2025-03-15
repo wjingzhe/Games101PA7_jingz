@@ -20,11 +20,11 @@ public:
     int width = 1280;
     int height = 960;
     double fov = 40;
-    Vector3f backgroundColor = Vector3f(0.235294, 0.67451, 0.843137);
+    Vector3f backgroundColor = Vector3f(0.235294f, 0.67451f, 0.843137f);
     int maxDepth = 1;
-    float RussianRoulette = 0.8;
+    float RussianRoulette = 0.8f;
 
-    Scene(int w, int h) : width(w), height(h)
+    Scene(int w, int h) : width(w), height(h), lights_emit_area_sum(0.0f)
     {}
 
     void Add(Object *object) { objects.push_back(object); }
@@ -32,11 +32,13 @@ public:
 
     const std::vector<Object*>& get_objects() const { return objects; }
     const std::vector<std::unique_ptr<Light> >&  get_lights() const { return lights; }
-    Intersection intersect(const Ray& ray) const;
+    Intersection getIntersect(const Ray& ray) const;
     BVHAccel *bvh;
     void buildBVH();
     Vector3f castRay(const Ray &ray, int depth) const;
     void sampleLight(Intersection &pos, float &pdf) const;
+    void JingzSampleLight(Intersection & result_pos, float & result_pdf) const;
+    void calculateLightEmitArea();//jingz 预先计算场景所有光照对象有效自发光面积
     bool trace(const Ray &ray, const std::vector<Object*> &objects, float &tNear, uint32_t &index, Object **hitObject);
     std::tuple<Vector3f, Vector3f> HandleAreaLight(const AreaLight &light, const Vector3f &hitPoint, const Vector3f &N,
                                                    const Vector3f &shadowPointOrig,
@@ -46,6 +48,7 @@ public:
     // creating the scene (adding objects and lights)
     std::vector<Object* > objects;
     std::vector<std::unique_ptr<Light> > lights;
+    float lights_emit_area_sum = 0.0f;//jingz
 
     // Compute reflection direction
     Vector3f reflect(const Vector3f &I, const Vector3f &N) const
