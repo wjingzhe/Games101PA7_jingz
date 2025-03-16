@@ -129,29 +129,27 @@ Vector3f Scene::castRay(const Ray &ray, int depth) const
         L_direct_factor = inter_L_direct.emit * f_r * dotProduct(wi, intersection.normal) * dotProduct(-wi, inter_L_direct.normal) * distance2_inv / pdf_light;
     }
 
-    //auto pMaterial = intersection.pMaterial;
-    // 
-    //jingz 先完成直接光照部分
-    //Vector3f L_direct_factor(0.1f, 0.0f, 0.0f);
+    //间接光，在漫反射物体上计算间接光照部分，假设所有非漫射物体都是镜面反射，可以考虑增加漫反射弹射次层数
+    Vector3f L_indir_factor(0.0f, 0.0f, 0.0f);
+    {
+        if (get_random_float() > RussianRoulette)//赌输了就没有间接光照衍生的射线
+        {
+            return L_direct_factor;
+        }
 
-    return L_direct_factor;
+        // 按照该材质的性质，给定入射方向和法向量，用某种分布采样一个出射方向
+        Vector3f wo2 = (intersection.pMaterial->sample(wo, intersection.normal)).normalized();
 
-    ////间接光
-    //Vector3f L_indir = Vector3f(0, 0, 0);
-    //{
-    //    if (get_random_float() > RussianRoulette)
-    //        return L_dir;
-    //    //按照该 材质的性质，给定入射方向与法向量，用某种分布采样一个出射方向
-    //    Vector3f wi = (intersection.pMaterial->sample(wo, intersection.normal)).normalized();
-    //    Ray L_indir_Ray(curPos, wi);
-    //    Intersection L_indir_Inter = getIntersect(L_indir_Ray);
-    //    if (L_indir_Inter.happened && !L_indir_Inter.pMaterial->hasEmission())
-    //    {
-    //        //给定一对入射、出射方向与法向量，计算 sample 方法得到该出射 方向的概率密度
-    //        float pdf = intersection.pMaterial->pdf(wo, wi, intersection.normal);
-    //        L_indir = castRay(L_indir_Ray, depth + 1) * L_indir_Inter.pMaterial->eval(wo, wi, intersection.normal) * dotProduct(wi, intersection.normal) / pdf / RussianRoulette;
-    //    }
-    //}
+        Ray ray_indir(curPos, wo2);
+        Intersection inter_L_indirect = getIntersect(ray_indir);
+        if (inter_L_indirect.happened && !inter_L_indirect.pMaterial->hasEmission())//非直接光源
+        {
+            // 给定一对入射、出射方向和法向量，计算sample方法得到该出射方向的概率密度
+            float pdf = inter_L_indirect.pMaterial->pdf(wo, wo2, intersection.normal);
+            L_indir_factor = castRay(ray_indir, depth + 1)
+                * (inter_L_indirect.pMaterial->eval(wo, wo2, intersection.normal) * dotProduct(wo2, intersection.normal) / pdf / RussianRoulette);
+        }
+    }
 
-    //return L_dir + L_indir;
+    return L_direct_factor + L_indir_factor;
 }
